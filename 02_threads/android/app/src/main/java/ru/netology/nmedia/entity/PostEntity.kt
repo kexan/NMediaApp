@@ -1,22 +1,31 @@
 package ru.netology.nmedia.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.enumartion.AttachmentType
 
 @Entity
 data class PostEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val author: String,
-    val authorAvatar: String = "",
+    val authorAvatar: String,
     val content: String,
     val published: String,
     val likedByMe: Boolean,
     val likes: Int = 0,
 ) {
-    fun toDto() = Post(id, author, authorAvatar, content, published, likedByMe, likes)
+    fun toDto() = Post(
+        id,
+        author,
+        authorAvatar,
+        content,
+        published,
+        likedByMe,
+        likes,
+    )
+
 
     companion object {
         fun fromDto(dto: Post) =
@@ -29,7 +38,8 @@ data class PostEntity(
                 dto.likedByMe,
                 dto.likes,
             )
-
     }
 }
 
+fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
+fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)

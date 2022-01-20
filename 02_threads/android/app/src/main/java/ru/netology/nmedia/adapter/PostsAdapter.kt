@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -49,7 +50,7 @@ class PostViewHolder(
 
 
             Glide.with(binding.avatar)
-                .load("http://10.0.2.2:9999/avatars/${post.authorAvatar}")
+                .load("${BASE_URL}/avatars/${post.authorAvatar}")
                 .fitCenter()
                 .circleCrop()
                 .timeout(10_000)
@@ -58,13 +59,13 @@ class PostViewHolder(
             if (post.attachment != null) {
                 when (post.attachment!!.type) {
                     AttachmentType.IMAGE -> {
-                        binding.attachmentGroup.isVisible = true
                         Glide.with(binding.attachment)
-                            .load("http://10.0.2.2:9999/images/${post.attachment!!.url}")
+                            .load("${BASE_URL}/images/${post.attachment!!.url}")
                             .fitCenter()
                             .centerCrop()
                             .timeout(10_000)
                             .into(binding.attachment)
+                        binding.attachmentGroup.isVisible = true
                     }
                 }
             }
