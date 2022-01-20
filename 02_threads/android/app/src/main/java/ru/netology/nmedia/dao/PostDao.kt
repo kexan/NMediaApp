@@ -3,6 +3,7 @@ package ru.netology.nmedia.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.enumartion.AttachmentType
 
 @Dao
 interface PostDao {
@@ -11,6 +12,9 @@ interface PostDao {
 
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
+
+    @Query("SELECT COUNT(*) FROM PostEntity")
+    suspend fun count(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: PostEntity)
@@ -46,5 +50,12 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
+
+    class Converters {
+        @TypeConverter
+        fun toAttachmentType(value: String) = enumValueOf<AttachmentType>(value)
+        @TypeConverter
+        fun fromAttachmentType(value: AttachmentType) = value.name
+    }
 }
 

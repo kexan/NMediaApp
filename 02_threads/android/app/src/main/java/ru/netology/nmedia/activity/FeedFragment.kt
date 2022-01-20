@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.FullsizePhotoFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -35,13 +36,20 @@ class FeedFragment : Fragment() {
                 findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
             }
 
+            override fun onAttachment(post: Post) {
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_fullsizePhotoFragment,
+                    Bundle().apply {
+                        textArg = post.attachment?.url
+                    })
+            }
+
             override fun onLike(post: Post) {
                 if (post.likedByMe) {
                     viewModel.unLikeById(post.id)
                 } else {
                     viewModel.likeById(post.id)
                 }
-                viewModel.loadPosts()
             }
 
             override fun onRemove(post: Post) {
