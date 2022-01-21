@@ -60,7 +60,7 @@ class PostViewHolder(
             if (post.attachment != null) {
                 when (post.attachment!!.type) {
                     AttachmentType.IMAGE -> {
-                        Glide.with(binding.attachment)
+                        Glide.with(binding.root.context)
                             .load("${BASE_URL}/media/${post.attachment!!.url}")
                             .fitCenter()
                             .centerCrop()
@@ -69,6 +69,8 @@ class PostViewHolder(
                         binding.attachmentGroup.isVisible = true
                     }
                 }
+            } else {
+                binding.attachmentGroup.isVisible = false
             }
 
             menu.setOnClickListener {
