@@ -3,7 +3,12 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
@@ -18,11 +23,12 @@ import java.io.File
 private val empty = Post(
     id = 0,
     content = "",
+    authorId = 0,
     author = "",
     authorAvatar = "",
     likedByMe = false,
     likes = 0,
-    published = ""
+    published = 0,
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,7 +36,18 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
         PostRepositoryImpl(AppDb.getInstance(context = application).postDao())
 
-    val data: LiveData<FeedModel> = repository.data.map(::FeedModel)
+    val data: LiveData<FeedModel> = AppAuth.getInstance()
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.data
+                .map { posts ->
+                    FeedModel(
+                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
+                        posts.isEmpty()
+                    )
+                }
+        }.asLiveData(Dispatchers.Default)
+
     private val _dataState = MutableLiveData<FeedModelState>()
 
     val dataState: LiveData<FeedModelState>
@@ -47,6 +64,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
         get() = _photo
+
+    val authenticated: Boolean
+        get() = AppAuth.getInstance().authStateFlow.value.id != 0L
 
     init {
         loadPosts()
@@ -108,7 +128,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    when(_photo.value) {
+                    when (_photo.value) {
                         noPhoto -> repository.save(it)
                         else -> _photo.value?.file?.let { file ->
                             repository.saveWithAttachment(it, MediaUpload(file))
@@ -134,12 +154,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         edited.value = edited.value?.copy(content = text)
-    }
-}
-
-fun <T> List<T>.replacePost(newPost: T, block: (T) -> Boolean): List<T> {
-    return map {
-        if (block(it)) newPost else it
     }
 }
 

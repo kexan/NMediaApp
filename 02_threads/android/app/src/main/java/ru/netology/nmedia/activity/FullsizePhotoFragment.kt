@@ -42,11 +42,7 @@ class FullsizePhotoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentFullsizePhotoBinding.inflate(
-            inflater,
-            container,
-            false
-        )
+        val binding = FragmentFullsizePhotoBinding.inflate(inflater, container, false)
 
         arguments?.textArg.let {
             Glide.with(binding.photo)

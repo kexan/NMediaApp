@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -40,6 +41,7 @@ class NewPostFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
@@ -58,17 +60,16 @@ class NewPostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentNewPostBinding.inflate(
-            inflater,
-            container,
-            false
-        )
+        val binding = FragmentNewPostBinding.inflate(inflater, container, false)
+
         fragmentBinding = binding
 
         arguments?.textArg
             ?.let(binding.edit::setText)
 
         binding.edit.requestFocus()
+
+
 
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

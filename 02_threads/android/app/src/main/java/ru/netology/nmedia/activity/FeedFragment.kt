@@ -1,5 +1,6 @@
 package ru.netology.nmedia.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,8 +21,8 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
 
-
     private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +30,16 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
+
+        val notAuthorizedDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+            .setMessage("Want to sign in?")
+            .setTitle("Not authorized")
+            .setPositiveButton("Sign up") { _, _ ->
+                findNavController().navigate(R.id.action_feedFragment_to_signUpFragment)
+            }
+            .setNegativeButton("Sign in") { _, _ ->
+                findNavController().navigate(R.id.action_feedFragment_to_signInFragment)
+            }
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
@@ -47,6 +58,12 @@ class FeedFragment : Fragment() {
             }
 
             override fun onLike(post: Post) {
+
+                if (!viewModel.authenticated) {
+                    notAuthorizedDialog.show()
+                    return
+                }
+
                 if (post.likedByMe) {
                     viewModel.unLikeById(post.id)
                 } else {
@@ -73,31 +90,40 @@ class FeedFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        viewModel.dataState.observe(viewLifecycleOwner, { state ->
-            binding.progress.isVisible = state.loading
-            binding.swiperefresh.isRefreshing = state.refreshing
-            if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
-                    .show()
-            }
-        })
+        viewModel.dataState.observe(viewLifecycleOwner,
+            { state ->
+                binding.progress.isVisible = state.loading
+                binding.swiperefresh.isRefreshing = state.refreshing
+                if (state.error) {
+                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.retry_loading) { viewModel.loadPosts() }
+                        .show()
+                }
+            })
 
-        viewModel.data.observe(viewLifecycleOwner, { state ->
-            adapter.submitList(state.posts)
-            binding.emptyText.isVisible = state.empty
-        })
+        viewModel.data.observe(viewLifecycleOwner,
+            { state ->
+                adapter.submitList(state.posts)
+                binding.emptyText.isVisible = state.empty
+            })
 
-        viewModel.data.observe(viewLifecycleOwner, { state ->
-            adapter.submitList(state.posts)
-            binding.emptyText.isVisible = state.empty
-        })
+        viewModel.data.observe(viewLifecycleOwner,
+            { state ->
+                adapter.submitList(state.posts)
+                binding.emptyText.isVisible = state.empty
+            })
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
         }
 
         binding.fab.setOnClickListener {
+
+            if (!viewModel.authenticated) {
+                notAuthorizedDialog.show()
+                return@setOnClickListener
+            }
+
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
 

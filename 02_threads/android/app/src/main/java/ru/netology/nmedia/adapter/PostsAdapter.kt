@@ -1,6 +1,7 @@
 package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
@@ -44,7 +45,7 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
-            published.text = post.published
+            published.text = post.published.toString()
             content.text = post.content
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
@@ -58,10 +59,10 @@ class PostViewHolder(
                 .into(binding.avatar)
 
             if (post.attachment != null) {
-                when (post.attachment!!.type) {
+                when (post.attachment.type) {
                     AttachmentType.IMAGE -> {
                         Glide.with(binding.root.context)
-                            .load("${BASE_URL}/media/${post.attachment!!.url}")
+                            .load("${BASE_URL}/media/${post.attachment.url}")
                             .fitCenter()
                             .centerCrop()
                             .timeout(10_000)
@@ -73,9 +74,13 @@ class PostViewHolder(
                 binding.attachmentGroup.isVisible = false
             }
 
+            menu.visibility = if (post.ownedByMe) View.VISIBLE else View.INVISIBLE
+
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
+                    // TODO: if we don't have other options, just remove dots
+                    menu.setGroupVisible(R.id.owned, post.ownedByMe)
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
