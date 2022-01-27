@@ -34,11 +34,36 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        // TODO: replace this in homework
-        println(message.data["content"])
+        val push = gson.fromJson(message.data[content], PushObject::class.java)
+        val currentUserId = AppAuth.getInstance().authStateFlow.value.id
+
+        var builder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Test notification")
+            .setContentText(push.content)
+
+
+        if (push.recipientId == null || push.recipientId == currentUserId) {
+            with(NotificationManagerCompat.from(this)) {
+                println("SUCCESS! current user id is $currentUserId")
+                notify(Random.nextInt(), builder.build())
+            }
+        }
+
+        if (push.recipientId != currentUserId && (push.recipientId == 0L || push.recipientId != 0L)) {
+            println("FAILED! current user id is $currentUserId ...sending new token....")
+            AppAuth.getInstance().sendPushToken()
+            return
+        }
+
     }
 
     override fun onNewToken(token: String) {
         AppAuth.getInstance().sendPushToken(token)
     }
 }
+
+data class PushObject(
+    val recipientId: Long? = null,
+    val content: String
+)
