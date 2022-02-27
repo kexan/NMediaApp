@@ -4,7 +4,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import ru.netology.nmedia.api.PostsApi
+import ru.netology.nmedia.api.Api
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.MediaUpload
@@ -17,7 +17,7 @@ class SignRepositoryImpl : SignRepository {
 
     override suspend fun updateUser(login: String, password: String) {
         try {
-            val response = PostsApi.service.updateUser(login, password)
+            val response = Api.service.updateUser(login, password)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -33,7 +33,7 @@ class SignRepositoryImpl : SignRepository {
 
     override suspend fun registerUser(login: String, password: String, name: String) {
         try {
-            val response = PostsApi.service.registerUser(login, password, name)
+            val response = Api.service.registerUser(login, password, name)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -53,7 +53,7 @@ class SignRepositoryImpl : SignRepository {
                 "file", upload.file.name, upload.file.asRequestBody()
             )
 
-            val response = PostsApi.service.upload(media)
+            val response = Api.service.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -78,7 +78,7 @@ class SignRepositoryImpl : SignRepository {
                 "file", photo.file.name, photo.file.asRequestBody()
             )
 
-            val response = PostsApi.service.registerWithPhoto(
+            val response = Api.service.registerWithPhoto(
                 login.toRequestBody("text/plain".toMediaType()),
                 password.toRequestBody("text/plain".toMediaType()),
                 name.toRequestBody("text/plain".toMediaType()),
