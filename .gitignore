@@ -1,7 +1,6 @@
 HELP.md
 .gradle
 build/
-google-services.json
 
 ### STS ###
 .apt_generated
@@ -26,11 +25,11 @@ captures/
 .cxx
 
 ### NetBeans ###
-nbproject/private/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
 ### VS Code ###
 .vscode/
@@ -45,4 +44,4 @@ nbdist/
 *.rar
 
 ### Gradle ###
-!gradle/wrapper/gradle-wrapper.jar
+!/gradle/wrapper/gradle-wrapper.jar
