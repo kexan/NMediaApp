@@ -1,7 +1,6 @@
 package ru.netology.nmedia.activity
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -13,25 +12,23 @@ import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class NewPostFragment : Fragment() {
 
     companion object {
         var Bundle.textArg: String? by StringArg
     }
 
-    private val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment,
-        factoryProducer = {
-            DependencyContainer.getInstance().viewModelFactory
-        })
-
+    private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
 
     private var fragmentBinding: FragmentNewPostBinding? = null
 
@@ -72,7 +69,6 @@ class NewPostFragment : Fragment() {
             ?.let(binding.edit::setText)
 
         binding.edit.requestFocus()
-
 
 
         val pickPhotoLauncher =

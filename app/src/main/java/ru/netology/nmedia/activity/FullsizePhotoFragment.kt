@@ -5,11 +5,13 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentFullsizePhotoBinding
 import ru.netology.nmedia.util.StringArg
 
+@AndroidEntryPoint
 class FullsizePhotoFragment : Fragment() {
 
     companion object {

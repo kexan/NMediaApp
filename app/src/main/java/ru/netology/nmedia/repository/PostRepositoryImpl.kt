@@ -2,6 +2,7 @@
 package ru.netology.nmedia.repository
 
 import androidx.lifecycle.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import okhttp3.MultipartBody
@@ -18,8 +19,9 @@ import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
+import javax.inject.Inject
 
-class PostRepositoryImpl(
+class PostRepositoryImpl @Inject constructor(
     private val dao: PostDao,
     private val api: ApiService
 ) : PostRepository {

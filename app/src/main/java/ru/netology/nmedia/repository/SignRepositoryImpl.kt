@@ -12,8 +12,9 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
+import javax.inject.Inject
 
-class SignRepositoryImpl(
+class SignRepositoryImpl @Inject constructor(
     private val appAuth: AppAuth,
     private val api: ApiService
 ) : SignRepository {

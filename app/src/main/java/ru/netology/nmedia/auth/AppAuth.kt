@@ -1,6 +1,5 @@
 package ru.netology.nmedia.auth
 
-import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
@@ -13,8 +12,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dto.PushToken
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AppAuth(
+@Singleton
+class AppAuth @Inject constructor(
     private val apiService: ApiService,
     private val authPrefs: SharedPreferences,
 ) {
