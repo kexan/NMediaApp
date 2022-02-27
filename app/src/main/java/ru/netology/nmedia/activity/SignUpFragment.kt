@@ -16,11 +16,16 @@ import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.databinding.SignUpFragmentBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.SignUpViewModel
 
 class SignUpFragment : Fragment() {
 
-    private val viewModel: SignUpViewModel by viewModels(ownerProducer = ::requireParentFragment)
+    private val viewModel: SignUpViewModel by viewModels(
+        ownerProducer = ::requireParentFragment,
+        factoryProducer = {
+            DependencyContainer.getInstance().viewModelFactory
+        })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?

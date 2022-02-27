@@ -19,14 +19,17 @@ import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
 
-class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
+class PostRepositoryImpl(
+    private val dao: PostDao,
+    private val api: ApiService
+) : PostRepository {
     override val data = dao.getAll()
         .map(List<PostEntity>::toDto)
         .flowOn(Dispatchers.Default)
 
     override suspend fun getAll() {
         try {
-            val response = Api.service.getAll()
+            val response = api.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -41,7 +44,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun save(post: Post) {
         try {
-            val response = Api.service.save(post)
+            val response = api.save(post)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -61,7 +64,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
                 "file", upload.file.name, upload.file.asRequestBody()
             )
 
-            val response = Api.service.upload(media)
+            val response = api.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -93,7 +96,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override suspend fun removeById(id: Long) {
         try {
             dao.removeById(id)
-            val response = Api.service.removeById(id)
+            val response = api.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -107,7 +110,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override suspend fun likeById(id: Long) {
         try {
             dao.likeById(id)
-            val response = Api.service.likeById(id)
+            val response = api.likeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -123,7 +126,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override suspend fun unLikeById(id: Long) {
         try {
             dao.unLikeById(id)
-            val response = Api.service.unLikeById(id)
+            val response = api.unLikeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }

@@ -4,12 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import ru.netology.nmedia.repository.SignRepositoryImpl
+import ru.netology.nmedia.repository.SignRepository
 import ru.netology.nmedia.util.SingleLiveEvent
 
-class SignInViewModel : ViewModel() {
-
-    private val repository = SignRepositoryImpl()
+class SignInViewModel(private val repository: SignRepository) : ViewModel() {
 
     private var _loginSuccess = SingleLiveEvent<Boolean>()
 

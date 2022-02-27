@@ -11,17 +11,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.FullsizePhotoFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
 
-    private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
+    private val viewModel: PostViewModel by viewModels(
+        ownerProducer = ::requireParentFragment,
+        factoryProducer = {
+            DependencyContainer.getInstance().viewModelFactory
+        })
 
 
     override fun onCreateView(
@@ -90,28 +96,28 @@ class FeedFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        viewModel.dataState.observe(viewLifecycleOwner,
-            { state ->
-                binding.progress.isVisible = state.loading
-                binding.swiperefresh.isRefreshing = state.refreshing
-                if (state.error) {
-                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.retry_loading) { viewModel.loadPosts() }
-                        .show()
-                }
-            })
+        viewModel.dataState.observe(viewLifecycleOwner
+        ) { state ->
+            binding.progress.isVisible = state.loading
+            binding.swiperefresh.isRefreshing = state.refreshing
+            if (state.error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
+                    .show()
+            }
+        }
 
-        viewModel.data.observe(viewLifecycleOwner,
-            { state ->
-                adapter.submitList(state.posts)
-                binding.emptyText.isVisible = state.empty
-            })
+        viewModel.data.observe(viewLifecycleOwner
+        ) { state ->
+            adapter.submitList(state.posts)
+            binding.emptyText.isVisible = state.empty
+        }
 
-        viewModel.data.observe(viewLifecycleOwner,
-            { state ->
-                adapter.submitList(state.posts)
-                binding.emptyText.isVisible = state.empty
-            })
+        viewModel.data.observe(viewLifecycleOwner
+        ) { state ->
+            adapter.submitList(state.posts)
+            binding.emptyText.isVisible = state.empty
+        }
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()

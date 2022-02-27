@@ -10,7 +10,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import ru.netology.nmedia.R
-import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.di.DependencyContainer
 import kotlin.random.Random
 
 
@@ -35,9 +35,9 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         val push = gson.fromJson(message.data[content], PushObject::class.java)
-        val currentUserId = AppAuth.getInstance().authStateFlow.value.id
+        val currentUserId = DependencyContainer.getInstance().appAuth.authStateFlow.value.id
 
-        var builder = NotificationCompat.Builder(this, channelId)
+        val builder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Test notification")
             .setContentText(push.content)
@@ -52,14 +52,14 @@ class FCMService : FirebaseMessagingService() {
 
         if (push.recipientId != currentUserId && (push.recipientId == 0L || push.recipientId != 0L)) {
             println("FAILED! current user id is $currentUserId ...sending new token....")
-            AppAuth.getInstance().sendPushToken()
+            DependencyContainer.getInstance().appAuth.sendPushToken()
             return
         }
 
     }
 
     override fun onNewToken(token: String) {
-        AppAuth.getInstance().sendPushToken(token)
+        DependencyContainer.getInstance().appAuth.sendPushToken(token)
     }
 }
 

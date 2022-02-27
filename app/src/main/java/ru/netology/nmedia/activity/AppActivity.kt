@@ -16,10 +16,15 @@ import com.google.firebase.messaging.FirebaseMessaging
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.AuthViewModel
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
-    private val viewModel: AuthViewModel by viewModels()
+    private val dependencyContainer = DependencyContainer.getInstance()
+    private val appAuth = dependencyContainer.appAuth
+    private val viewModel: AuthViewModel by viewModels {
+        dependencyContainer.viewModelFactory
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +91,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                     .setMessage("Are you sure?")
                     .setTitle("Sign out")
                     .setPositiveButton("Yes") { _, _ ->
-                        AppAuth.getInstance().removeAuth()
+                        appAuth.removeAuth()
                         findNavController(R.id.nav_host_fragment).navigateUp()
                     }
                     .setNegativeButton("No") { _, _ ->

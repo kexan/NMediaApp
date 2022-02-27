@@ -16,6 +16,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            freeCompilerArgs += "-opt-in=Kotlin.RequiresOptIn"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -67,8 +73,6 @@ dependencies {
     def coroutines_version = "1.6.0"
     def imagepicker_version = "2.1"
     def fragment_version = "1.4.0"
-    def gson_version = "2.8.9"
-    def okhttp_version = "4.9.3"
     def play_services_base_version = "18.0.1"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])

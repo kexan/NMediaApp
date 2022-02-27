@@ -15,6 +15,7 @@ import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -27,7 +28,10 @@ class NewPostFragment : Fragment() {
 
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment,
-    )
+        factoryProducer = {
+            DependencyContainer.getInstance().viewModelFactory
+        })
+
 
     private var fragmentBinding: FragmentNewPostBinding? = null
 

@@ -8,13 +8,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.model.PhotoModel
-import ru.netology.nmedia.repository.SignRepositoryImpl
+import ru.netology.nmedia.repository.SignRepository
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
 
-class SignUpViewModel : ViewModel() {
-
-    private val repository = SignRepositoryImpl()
+class SignUpViewModel(private val repository: SignRepository) : ViewModel() {
 
     private var _registrationSuccess = SingleLiveEvent<Boolean>()
     val registrationSuccess: LiveData<Boolean>

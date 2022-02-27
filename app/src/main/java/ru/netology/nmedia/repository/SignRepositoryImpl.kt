@@ -4,7 +4,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import ru.netology.nmedia.api.Api
+import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.MediaUpload
@@ -13,17 +13,19 @@ import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
 
-class SignRepositoryImpl : SignRepository {
+class SignRepositoryImpl(
+    private val appAuth: AppAuth,
+    private val api: ApiService
+) : SignRepository {
 
     override suspend fun updateUser(login: String, password: String) {
         try {
-            val response = Api.service.updateUser(login, password)
+            val response = api.updateUser(login, password)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            AppAuth.getInstance()
-                .setAuth(body.id, body.token ?: "invalid token")
+            appAuth.setAuth(body.id, body.token ?: "invalid token")
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -33,13 +35,12 @@ class SignRepositoryImpl : SignRepository {
 
     override suspend fun registerUser(login: String, password: String, name: String) {
         try {
-            val response = Api.service.registerUser(login, password, name)
+            val response = api.registerUser(login, password, name)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            AppAuth.getInstance()
-                .setAuth(body.id, body.token ?: "invalid token")
+            appAuth.setAuth(body.id, body.token ?: "invalid token")
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -53,7 +54,7 @@ class SignRepositoryImpl : SignRepository {
                 "file", upload.file.name, upload.file.asRequestBody()
             )
 
-            val response = Api.service.upload(media)
+            val response = api.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -78,7 +79,7 @@ class SignRepositoryImpl : SignRepository {
                 "file", photo.file.name, photo.file.asRequestBody()
             )
 
-            val response = Api.service.registerWithPhoto(
+            val response = api.registerWithPhoto(
                 login.toRequestBody("text/plain".toMediaType()),
                 password.toRequestBody("text/plain".toMediaType()),
                 name.toRequestBody("text/plain".toMediaType()),
@@ -92,8 +93,7 @@ class SignRepositoryImpl : SignRepository {
                 response.code(),
                 response.message()
             )
-            AppAuth.getInstance()
-                .setAuth(body.id, body.token ?: "invalid token")
+            appAuth.setAuth(body.id, body.token ?: "invalid token")
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
