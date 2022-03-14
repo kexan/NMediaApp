@@ -22,13 +22,15 @@ import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
 
-    private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
+    private val postViewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
+    private val authViewModel: AuthViewModel by viewModels(ownerProducer = ::requireParentFragment)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +51,7 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
-                viewModel.edit(post)
+                postViewModel.edit(post)
                 findNavController().navigate(
                     R.id.action_feedFragment_to_newPostFragment,
                     Bundle().apply { textArg = post.content })
@@ -65,20 +67,20 @@ class FeedFragment : Fragment() {
 
             override fun onLike(post: Post) {
 
-                if (!viewModel.authenticated) {
+                if (!postViewModel.authenticated) {
                     notAuthorizedDialog.show()
                     return
                 }
 
                 if (post.likedByMe) {
-                    viewModel.unLikeById(post.id)
+                    postViewModel.unLikeById(post.id)
                 } else {
-                    viewModel.likeById(post.id)
+                    postViewModel.likeById(post.id)
                 }
             }
 
             override fun onRemove(post: Post) {
-                viewModel.removeById(post.id)
+                postViewModel.removeById(post.id)
             }
 
             override fun onShare(post: Post) {
@@ -96,20 +98,20 @@ class FeedFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        viewModel.dataState.observe(
+        postViewModel.dataState.observe(
             viewLifecycleOwner
         ) { state ->
             binding.progress.isVisible = state.loading
             binding.swiperefresh.isRefreshing = state.refreshing
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
+                    .setAction(R.string.retry_loading) { postViewModel.loadPosts() }
                     .show()
             }
         }
 
         viewLifecycleOwner.lifecycle.coroutineScope.launchWhenCreated {
-            viewModel.data.collectLatest {
+            postViewModel.data.collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -127,9 +129,13 @@ class FeedFragment : Fragment() {
             adapter.refresh()
         }
 
+        authViewModel.data.observe(viewLifecycleOwner) {
+            adapter.refresh()
+        }
+
         binding.fab.setOnClickListener {
 
-            if (!viewModel.authenticated) {
+            if (!postViewModel.authenticated) {
                 notAuthorizedDialog.show()
                 return@setOnClickListener
             }
