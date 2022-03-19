@@ -4,8 +4,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import ru.netology.nmedia.adapter.OnInteractionListener
-import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
@@ -15,7 +13,9 @@ import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SignRepositoryImpl @Inject constructor(
     private val appAuth: AppAuth,
     private val api: ApiService
