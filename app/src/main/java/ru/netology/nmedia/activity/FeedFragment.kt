@@ -6,23 +6,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.FullsizePhotoFragment.Companion.textArg
+import ru.netology.nmedia.adapter.FeedLoadStateAdapter
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 @ExperimentalCoroutinesApi
@@ -30,7 +28,6 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 class FeedFragment : Fragment() {
 
     private val postViewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
-    private val authViewModel: AuthViewModel by viewModels(ownerProducer = ::requireParentFragment)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,19 +93,10 @@ class FeedFragment : Fragment() {
             }
         })
 
-        binding.list.adapter = adapter
-
-        postViewModel.dataState.observe(
-            viewLifecycleOwner
-        ) { state ->
-            binding.progress.isVisible = state.loading
-            binding.swiperefresh.isRefreshing = state.refreshing
-            if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) { postViewModel.loadPosts() }
-                    .show()
-            }
-        }
+        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = FeedLoadStateAdapter { adapter.retry() },
+            footer = FeedLoadStateAdapter { adapter.retry() }
+        )
 
         viewLifecycleOwner.lifecycle.coroutineScope.launchWhenCreated {
             postViewModel.data.collectLatest {
@@ -126,10 +114,6 @@ class FeedFragment : Fragment() {
         }
 
         binding.swiperefresh.setOnRefreshListener {
-            adapter.refresh()
-        }
-
-        authViewModel.data.observe(viewLifecycleOwner) {
             adapter.refresh()
         }
 
